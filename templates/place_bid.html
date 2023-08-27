@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Place Bid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #333;
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .bid-form {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .bid-form label {
+      font-weight: bold;
+    }
+
+    .bid-form input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .bid-form input[type="submit"] {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .bid-form input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Place Bid</h2>
+  </div>
+
+  <div class="container">
+    <div class="bid-form">
+      <form action="#" method="POST">
+        <label for="bidAmount">Bid Amount:</label>
+        <input type="number" id="bidAmount" name="bidAmount" required>
+
+        <input type="submit" value="Place Bid">
+      </form>
+    </div>
+  </div>
+</body>
+</html>

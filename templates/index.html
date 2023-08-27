@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Auction Management System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #dea3d0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+        }
+        .product-details {
+            background-color: #f7f7f7;
+            padding: 10px;
+        }
+        .auction {
+            background-color: #fff;
+            padding: 10px;
+        }
+        .table {
+            margin-bottom: 20px;
+        }
+        .btn {
+            margin-top: 10px;
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Online Auction Management System</h1>
+        <div class="row">
+            <div class="col-md-6 product-details">
+                <h4>Product Details</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Minimum Bidding Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.min_amount }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6 auction">
+                <h4>Auction</h4>
+                <form id="set-clients-form">
+                    <div class="form-group">
+                        <label for="total_clients">Number of Clients:</label>
+                        <input type="number" id="total_clients" name="total_clients" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bid_limit">Bidding Limit:</label>
+                        <input type="number" id="bid_limit" name="bid_limit" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Set Clients and Bidding Limit</button>
+                </form>
+                <form id="registration-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="product_id">Product ID:</label>
+                        <input type="text" id="product_id" name="product_id" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="min_amount">Minimum Quoted Amount:</label>
+                        <input type="text" id="min_amount" name="min_amount" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                </form>
+                <div id="message" class="alert alert-info mt-3" style="display: none;"></div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Participants</h4>
+                        <table id="participant-table" class="table" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Participant ID</th>
+                                    <th>Product ID</th>
+                                    <th>Quoted Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-12">
+                        <h4>Maximum Bidded Amounts</h4>
+                        <table id="max-amount-table" class="table" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Product ID</th>
+                                    <th>Maximum Bidded Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#set-clients-form').on('submit', function(event) {
+                event.preventDefault();
+                var totalClients = $('#total_clients').val();
+                var bidLimit = $('#bid_limit').val();
+                $.ajax({
+                    url: '/setup',
+                    method: 'POST',
+                    data: {
+                        total_clients: totalClients,
+                        bid_limit: bidLimit
+                    },
+                    success: function(response) {
+                        $('#set-clients-form').hide();
+                        $('#registration-form').show();
+                    }
+                });
+            });
+
+            $('#registration-form').on('submit', function(event) {
+                event.preventDefault();
+                var productID = $('#product_id').val();
+                var minAmount = $('#min_amount').val();
+                $.ajax({
+                    url: '/register',
+                    method: 'POST',
+                    data: {
+                        product_id: productID,
+                        min_amount: minAmount
+                    },
+                    success: function(response) {
+                        $('#message').text(response.message).show();
+                        $('#product_id').val('');
+                        $('#min_amount').val('');
+                        if (response.participants) {
+                            $('#participant-table tbody').empty();
+                            for (var i = 0; i < response.participants.length; i++) {
+                                var participant = response.participants[i];
+                                var row = '<tr><td>' + participant.participant_id + '</td><td>' + participant.product_id + '</td><td>' + participant.min_amount + '</td></tr>';
+                                $('#participant-table tbody').append(row);
+                            }
+                            $('#participant-table').show();
+                        }
+                        if (response.max_amounts) {
+                            $('#max-amount-table tbody').empty();
+                            for (var productID in response.max_amounts) {
+                                var maxAmount = response.max_amounts[productID];
+                                var row = '<tr><td>' + productID + '</td><td>' + maxAmount + '</td></tr>';
+                                $('#max-amount-table tbody').append(row);
+                            }
+                            $('#max-amount-table').show();
+                        }
+                        if (response.message === 'Auction completed') {
+                            $('#registration-form').hide();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
